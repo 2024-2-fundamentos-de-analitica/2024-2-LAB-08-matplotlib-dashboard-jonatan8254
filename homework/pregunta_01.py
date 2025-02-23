@@ -39,10 +39,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def load_data():
-    # Lee el archivo CSV desde la carpeta "data"
-    return pd.read_csv("data/shipping-data.csv")
+    # Se carga el archivo CSV desde la carpeta "data"
+    return pd.read_csv("files\input\shipping-data.csv")
 
-def plot_warehouse_block(df):
+def plot_shipping_per_warehouse(df):
     plt.figure(figsize=(6, 4))
     counts = df["Warehouse_block"].value_counts().sort_index()
     counts.plot.bar(color="cornflowerblue")
@@ -66,17 +66,16 @@ def plot_mode_of_shipment(df):
         colors=["mediumseagreen", "goldenrod", "slateblue"]
     )
     plt.title("Mode of Shipment")
-    plt.ylabel("")  # Se elimina la etiqueta del eje y
+    plt.ylabel("")  # Quitar etiqueta del eje y
     plt.tight_layout()
     plt.savefig("docs/mode_of_shipment.png")
     plt.close()
 
-def plot_customer_rating(df):
+def plot_average_customer_rating(df):
     plt.figure(figsize=(6, 4))
-    # Se agrupa por modo de envío y se calculan estadísticas de Customer_rating
     stats = df.groupby("Mode_of_Shipment")["Customer_rating"].agg(["min", "mean", "max"]).sort_values("mean")
     
-    # Se dibuja una barra de fondo que representa el rango (min a max)
+    # Barra de fondo: representa el rango de calificaciones (mínimo a máximo)
     plt.barh(
         y=stats.index,
         width=stats["max"] - stats["min"],
@@ -86,7 +85,7 @@ def plot_customer_rating(df):
         alpha=0.7
     )
     
-    # Se dibuja la barra que indica la media, con color según el valor
+    # Barra de la media, coloreada según la calificación
     colors = ["seagreen" if val >= 3.0 else "tomato" for val in stats["mean"]]
     plt.barh(
         y=stats.index,
@@ -118,8 +117,8 @@ def plot_weight_distribution(df):
     plt.close()
 
 def create_dashboard_html():
-    # Se genera el dashboard HTML que organiza las imágenes en dos columnas
-    html = """
+    # Se genera el archivo HTML del dashboard referenciando las imágenes generadas
+    html_content = """
     <!DOCTYPE html>
     <html>
       <head>
@@ -139,18 +138,18 @@ def create_dashboard_html():
       </body>
     </html>
     """
-    with open("docs/index.html", "w", encoding="utf-8") as f:
-        f.write(html)
+    with open("docs/index.html", "w", encoding="utf-8") as file:
+        file.write(html_content)
 
 def pregunta_01():
-    # Crea la carpeta "docs" si no existe
+    # Se crea la carpeta "docs" si no existe
     if not os.path.exists("docs"):
         os.makedirs("docs")
     
     df = load_data()
-    plot_warehouse_block(df)
+    plot_shipping_per_warehouse(df)
     plot_mode_of_shipment(df)
-    plot_customer_rating(df)
+    plot_average_customer_rating(df)
     plot_weight_distribution(df)
     create_dashboard_html()
 
